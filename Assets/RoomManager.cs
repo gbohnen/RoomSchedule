@@ -29,16 +29,20 @@ public class Room
 
 public class RoomManager : MonoBehaviour {
 
+    public static RoomManager Instance;
+
     Dictionary<string, Room> roomList;
 
     public GameObject roomButtonPrefab;
     public Transform scrollRect;
     public Scrollbar scrollBar;
-
+    public GameObject roomPanel;
 
 	// Use this for initialization
 	void Start ()
     {
+        Instance = this;
+
         // load default objects
         roomList = new Dictionary<string, Room>();
 
@@ -85,6 +89,9 @@ public class RoomManager : MonoBehaviour {
         List<Room> temp = roomList.Values.ToList<Room>();
         var linqlist = temp.Where( x => x.RoomName != null).ToList<Room>();
         BuildRoomList(linqlist);
+
+        // set deafault UI state
+        ClosePanel();
 	}
 
     public void BuildRoomList(List<Room> list)
@@ -180,4 +187,15 @@ public class RoomManager : MonoBehaviour {
     }
 
     #endregion
+
+    public void ClosePanel()
+    {
+        roomPanel.SetActive(false);
+    }
+
+    public void ClickRoom(string name)
+    {
+        roomPanel.SetActive(true);
+        roomPanel.GetComponent<RoomDialogue>().LoadPanel(name);
+    }
 }

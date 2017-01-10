@@ -40,6 +40,6 @@ public class RoomButton : MonoBehaviour {
 
     public void ClickRoom()
     {
-
+        RoomManager.Instance.ClickRoom(thisRoom.RoomName);
     }
 }
