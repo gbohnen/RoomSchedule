@@ -64,7 +64,7 @@ public class RoomManager : MonoBehaviour {
         if (PlayerPrefs.HasKey("Day") && PlayerPrefs.HasKey("Month") && PlayerPrefs.HasKey("Year"))
             LastReportDate = new Date(PlayerPrefs.GetInt("Day"), PlayerPrefs.GetInt("Month"), PlayerPrefs.GetInt("Year"));
         else
-            LastReportDate = new Date(1, 1, 1969);
+            LastReportDate = new Date(5, 5, 2017);
 
         // load default objects
         roomList = new Dictionary<string, Room>();
