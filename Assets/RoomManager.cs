@@ -6,13 +6,23 @@ using System.Xml;
 using System.Linq;
 using UnityEngine.UI;
 
-public enum Building { ACAD, Centennial, Columbine, Cucharas, Dwire, Engineering, Osborne, Satellite, UHall }
+public enum Building     { ACAD, Centennial, Columbine, Cucharas, Dwire, Engineering, Osborne, Satellite, UHall }
 
 public class Room
 {
+    public Room(Building b, string n, List<Date> l)
+    {
+        Building = b;
+        RoomName = n;
+        CleaningDates = l;
+    }
+
+
     // date of last cleaning. loaded from bin file
-    public string DateCleaned
-    { get; set; }
+    public Date DateCleaned
+    {
+        get { return CleaningDates[0]; }
+    }
 
     public Building Building
     { get; set; }
@@ -24,7 +34,11 @@ public class Room
     // list of classes within the room. loaded from xml
 
     // last grade of room. loaded from private xml
+    public string Grade
+    { get; set; }
 
+    public List<Date> CleaningDates
+    { get; set; }
 }
 
 public class RoomManager : MonoBehaviour {
@@ -38,15 +52,23 @@ public class RoomManager : MonoBehaviour {
     public Scrollbar scrollBar;
     public GameObject roomPanel;
 
+    public Date LastReportDate
+    { get; private set; }
+
 	// Use this for initialization
 	void Start ()
     {
         Instance = this;
 
+        // get last report date
+        if (PlayerPrefs.HasKey("Day") && PlayerPrefs.HasKey("Month") && PlayerPrefs.HasKey("Year"))
+            LastReportDate = new Date(PlayerPrefs.GetInt("Day"), PlayerPrefs.GetInt("Month"), PlayerPrefs.GetInt("Year"));
+        else
+            LastReportDate = new Date(1, 1, 1969);
+
         // load default objects
         roomList = new Dictionary<string, Room>();
-
-
+        
         // load room names and times
         TextAsset roomFile = (TextAsset)Resources.Load(@"RoomData");
         XmlDocument roomDoc = new XmlDocument();
@@ -68,9 +90,7 @@ public class RoomManager : MonoBehaviour {
                     name = roomNode.Name;
 
                 // new room
-                Room room = new Room();
-                room.RoomName = name;
-                room.Building = (Building)Enum.Parse(typeof(Building), buildingNode.Name);
+                Room room = new Room((Building)Enum.Parse(typeof(Building), buildingNode.Name), name, new List<Date>());
 
                 // load room times
                 // something something parse roomNode.InnerText
@@ -193,9 +213,19 @@ public class RoomManager : MonoBehaviour {
         roomPanel.SetActive(false);
     }
 
-    public void ClickRoom(string name)
+    public void ClickRoom(Room name)
     {
         roomPanel.SetActive(true);
         roomPanel.GetComponent<RoomDialogue>().LoadPanel(name);
+    }
+
+    public void ClickConfirm()
+    {
+        if (roomPanel.GetComponent<RoomDialogue>().CheckToggles())
+        {
+            roomPanel.GetComponent<RoomDialogue>().currentRoom.CleaningDates.Add(DateHelper.GetTodaysDate());
+            ClickAll();
+            ClosePanel();
+        }
     }
 }

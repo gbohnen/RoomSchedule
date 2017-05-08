@@ -22,17 +22,27 @@ public class RoomButton : MonoBehaviour {
     public void LoadData(Room newRoom)
     {
         buttonName.text = newRoom.RoomName;
-
-        cleaned.isOn = (Random.Range(0, 2) == 1);
-
-        int blurp = Random.Range(0, 5);
-        switch (blurp)
+        if (newRoom.CleaningDates.Count > 0)
         {
-            case 0: condition.color = terrible; break;
-            case 1: condition.color = bad; break;
-            case 2: condition.color = moderate; break;
-            case 3: condition.color = good; break;
-            case 4: condition.color = great; break;
+            dateCleaned.text = newRoom.DateCleaned.PrintDateShort();
+            grade.text = newRoom.Grade;
+            cleaned.isOn = DateHelper.SinceLastCleaning(newRoom.DateCleaned, RoomManager.Instance.LastReportDate);
+
+            switch (newRoom.Grade)
+            {
+                case "A": condition.color = great; break;
+                case "B": condition.color = good; break;
+                case "C": condition.color = moderate; break;
+                case "D": condition.color = bad; break;
+                case "F": condition.color = terrible; break;
+            }
+        }
+        else
+        {
+            dateCleaned.text = "";
+            grade.text = "F";
+            cleaned.isOn = false;
+                condition.color = terrible;
         }
 
         thisRoom = newRoom;
@@ -40,6 +50,6 @@ public class RoomButton : MonoBehaviour {
 
     public void ClickRoom()
     {
-        RoomManager.Instance.ClickRoom(thisRoom.RoomName);
+        RoomManager.Instance.ClickRoom(thisRoom);
     }
 }
