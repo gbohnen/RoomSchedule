@@ -9,20 +9,22 @@ public static class SavingLoading
 
     public static void SaveData(Dictionary<string, Room> roomList)
     {
-        using (StreamWriter outputFile = new StreamWriter(path))
-        {
             // only need to save room name and list of cleaning dates
-            foreach (KeyValuePair<string, Room> pair in roomList)
-            {
-                outputFile.WriteLine(pair.Key + ":" + ListToString(pair.Value.CleaningDates));
-            }
+        foreach (KeyValuePair<string, Room> pair in roomList)
+        {
+            PlayerPrefs.SetString(pair.Key, ListToString(pair.Value.CleaningDates));
         }
     }
 
-    static public Dictionary<string, Room> LoadData()
+    static public void LoadData(Dictionary<string, Room> data)
     {
-
-        return null;
+        foreach (KeyValuePair<string, Room> pair in data)
+        {
+            if (PlayerPrefs.HasKey(pair.Key))
+                PlayerPrefs.SetString(pair.Key, ListToString(pair.Value.CleaningDates));
+            else
+                PlayerPrefs.SetString(pair.Key, ListToString(new List<Date>()));
+        }
     }
 
     static string ListToString(List<Date> list)
